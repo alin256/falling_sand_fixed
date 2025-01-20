@@ -18,7 +18,7 @@ function make2DArray(cols, rows) {
 // The grid
 let grid;
 // How big is each square?
-let w = 1;
+let w = 5;
 let cols, rows;
 let hueValue = 200;
 let dragged = false;
@@ -89,7 +89,17 @@ function draw() {
   
   // Check every cell
   for (let j = rows-1; j >= 0; j--) {
-    for (let i = 0; i < cols; i++) {
+    let reverseRow = false;
+    if (random(1) < 0.5) {
+      reverseRow = true;
+    }
+    let i;
+    for (let iC = 0; iC < cols; iC++) {
+      if (reverseRow){
+        i = cols - 1 - iC;
+      }else{
+        i = iC;
+      }
       // What is the state?
       let state = grid[i][j];
       
