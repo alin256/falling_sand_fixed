@@ -18,9 +18,10 @@ function make2DArray(cols, rows) {
 // The grid
 let grid;
 // How big is each square?
-let w = 5;
+let w = 1;
 let cols, rows;
 let hueValue = 200;
+let dragged = false;
 
 // Check if a row is within the bounds
 function withinCols(i) {
@@ -33,7 +34,7 @@ function withinRows(j) {
 }
 
 function setup() {
-  createCanvas(500, 300);
+  createCanvas(1000, 600);
   colorMode(HSB, 360, 255, 255);
   cols = width / w;
   rows = height / w;
@@ -41,6 +42,7 @@ function setup() {
 }
 
 function mouseDragged() {
+  dragged = true;
   let mouseCol = floor(mouseX / w);
   let mouseRow = floor(mouseY / w);
   
@@ -67,6 +69,7 @@ function mouseDragged() {
 
 function draw() {
   background(0);
+
   
   // Draw the sand
   for (let i = 0; i < cols; i++) {
@@ -138,5 +141,15 @@ function draw() {
       }
     }
   }
+  if (!dragged){
+    let i = floor(random(0, cols));
+    nextGrid[i][0] = hueValue;
+    // Change the color of the sand over time
+    hueValue += 0.05;
+    if (hueValue > 360) {
+      hueValue = 1;
+    }
+  }
   grid = nextGrid;
+  dragged = false;
 }
