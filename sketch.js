@@ -23,6 +23,7 @@ let cols, rows;
 let hueValue = 200;
 let dragged = false;
 
+
 // Check if a row is within the bounds
 function withinCols(i) {
   return i >= 0 && i <= cols - 1;
@@ -84,22 +85,17 @@ function draw() {
     }
   }
   
+  
   // Create a 2D array for the next frame of animation
   let nextGrid = make2DArray(cols, rows);
+  let sh_inds = Array.from({ length: cols }, (_, i) => i);
   
   // Check every cell
   for (let j = rows-1; j >= 0; j--) {
-    let reverseRow = false;
-    if (random(1) < 0.5) {
-      reverseRow = true;
-    }
     let i;
+    shuffle(sh_inds, true);
     for (let iC = 0; iC < cols; iC++) {
-      if (reverseRow){
-        i = cols - 1 - iC;
-      }else{
-        i = iC;
-      }
+      i = sh_inds[iC];
       // What is the state?
       let state = grid[i][j];
       
