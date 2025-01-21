@@ -23,7 +23,8 @@ let cols, rows;
 let hueValue = 200;
 let dragged = false;
 let letItSnow = false;
-let counterTextDiv;
+let counterTextDivLeft;
+let counterTextDivRight;
 let graphicsHeight = 600;
 let graphicsWidth = 1000;
 
@@ -45,9 +46,17 @@ function setup() {
   rows = height / w;
   grid = make2DArray(cols, rows);
   
-  // Create a DOM element to display text
-  counterTextDiv = createDiv('Counter'); // Empty initially
-  counterTextDiv.position(10, graphicsHeight); // Position the text below the input field
+  // Create the first counter div
+  counterTextDivLeft = createDiv('Mass conservative'); 
+  counterTextDivLeft.position(10, graphicsHeight); 
+  counterTextDivLeft.style('font-family', 'Arial'); // Set font family
+  counterTextDivLeft.style('font-size', '24px');   // Set font size
+  
+  // Create the second counter div
+  counterTextDivRight = createDiv('Cosding Train'); 
+  counterTextDivRight.position(10 + graphicsWidth / 2, graphicsHeight); 
+  counterTextDivRight.style('font-family', 'Arial'); // Set font family
+  counterTextDivRight.style('font-size', '24px');    // Set font size
 }
 
 function mouseDragged() {
@@ -204,7 +213,8 @@ function getNextGridConservative(grid, col_offset=0, nextGrid = undefined){
 function draw() {
   background(0);
 
-  let particlesCount = 0;
+  let particlesCountLeft = 0;
+  let particlesCountRight = 0;
   // Draw the sand
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
@@ -214,11 +224,16 @@ function draw() {
         let x = i * w;
         let y = j * w;
         square(x, y, w);
-        particlesCount++;
+        if (i < cols / 2){
+          particlesCountLeft++;
+        }else{
+          particlesCountRight++;
+        }
       }
     }
   }
-  counterTextDiv.html(`${particlesCount} particles (${Math.round(particlesCount*100.0*w*w/graphicsHeight/graphicsWidth)}%)`);
+  counterTextDivLeft.html(`Mass conservative: ${particlesCountLeft} particles (${Math.round(particlesCountLeft*100.0*w*w/graphicsHeight/graphicsWidth*2)}%)`);
+  counterTextDivRight.html(`Coding Train: ${particlesCountRight} particles (${Math.round(particlesCountRight*100.0*w*w/graphicsHeight/graphicsWidth*2)}%)`);
   
   let nextGrid = make2DArray(cols, rows);
 
