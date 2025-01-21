@@ -22,6 +22,7 @@ let w = 5;
 let cols, rows;
 let hueValue = 200;
 let dragged = false;
+let letItSnow = false;
 let counterTextDiv;
 let graphicsHeight = 600;
 let graphicsWidth = 1000;
@@ -38,7 +39,6 @@ function withinRows(j) {
 }
 
 function setup() {
-  
   createCanvas(graphicsWidth, graphicsHeight);
   colorMode(HSB, 360, 255, 255);
   cols = width / w;
@@ -76,26 +76,7 @@ function mouseDragged() {
   }
 }
 
-function draw() {
-  background(0);
-
-  let particlesCount = 0;
-  // Draw the sand
-  for (let i = 0; i < cols; i++) {
-    for (let j = 0; j < rows; j++) {
-      noStroke();
-      if (grid[i][j] > 0) {
-        fill(grid[i][j], 255, 255);
-        let x = i * w;
-        let y = j * w;
-        square(x, y, w);
-        particlesCount++;
-      }
-    }
-  }
-  counterTextDiv.html(`${particlesCount} particles (${Math.round(particlesCount*100.0*w*w/graphicsHeight/graphicsWidth)}%)`);
-  
-  
+function getNextGridConservative(grid){
   // Create a 2D array for the next frame of animation
   let nextGrid = make2DArray(cols, rows);
   let sh_inds = Array.from({ length: cols }, (_, i) => i);
@@ -157,7 +138,31 @@ function draw() {
       }
     }
   }
-  if (!dragged){
+
+}
+
+function draw() {
+  background(0);
+
+  let particlesCount = 0;
+  // Draw the sand
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      noStroke();
+      if (grid[i][j] > 0) {
+        fill(grid[i][j], 255, 255);
+        let x = i * w;
+        let y = j * w;
+        square(x, y, w);
+        particlesCount++;
+      }
+    }
+  }
+  counterTextDiv.html(`${particlesCount} particles (${Math.round(particlesCount*100.0*w*w/graphicsHeight/graphicsWidth)}%)`);
+  
+  nextGrid = getNextGridConservative(grid);
+  
+  if (!dragged && letItSnow){
     let i = floor(random(0, cols));
     nextGrid[i][0] = hueValue;
     // Change the color of the sand over time
@@ -166,6 +171,7 @@ function draw() {
       hueValue = 1;
     }
   }
+  
   grid = nextGrid;
   dragged = false;
 }
