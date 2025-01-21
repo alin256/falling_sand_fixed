@@ -30,7 +30,7 @@ let graphicsWidth = 1000;
 
 // Check if a row is within the bounds
 function withinCols(i) {
-  return i >= 0 && i <= cols - 1;
+  return i >= 0 && i <= cols / 2 - 1;
 }
 
 // Check if a column is within the bounds
@@ -65,6 +65,7 @@ function mouseDragged() {
         let row = mouseRow + j;
         if (withinCols(col) && withinRows(row)) {
           grid[col][row] = hueValue;
+          grid[col + cols / 2][row] = hueValue;
         }
       }
     }
@@ -76,12 +77,16 @@ function mouseDragged() {
   }
 }
 
-function getNextGridCodingTrain(grid){
+function getNextGridCodingTrain(grid, col_offset=0, nextGrid=undefined){
   // Create a 2D array for the next frame of animation
-  let nextGrid = make2DArray(cols, rows);
+  //using half the field
+  my_cols = cols / 2;
+  if (nextGrid === undefined){
+    nextGrid = make2DArray(cols, rows);
+  }
 
   // Check every cell
-  for (let i = 0; i < cols; i++) {
+  for (let i = col_offset; i < col_offset+my_cols; i++) {
     for (let j = 0; j < rows ; j++) {
       // What is the state?
       let state = grid[i][j];
@@ -100,10 +105,10 @@ function getNextGridCodingTrain(grid){
         // Check below left or right
         let belowA = -1;
         let belowB = -1;
-        if (withinCols(i + dir)) {
+        if (withinCols(i + dir - col_offset)) {
           belowA = grid[i + dir][j + 1];
         }
-        if (withinCols(i - dir)) {
+        if (withinCols(i - dir - col_offset)) {
           belowB = grid[i - dir][j + 1];
         }
         
@@ -126,24 +131,28 @@ function getNextGridCodingTrain(grid){
 }
 
 
-function getNextGridConservative(grid){
+function getNextGridConservative(grid, col_offset=0, nextGrid = undefined){
   // Create a 2D array for the next frame of animation
-  let nextGrid = make2DArray(cols, rows);
-  let sh_inds = Array.from({ length: cols }, (_, i) => i);
+  // using only half grid
+  let my_cols = cols / 2;
+  if (nextGrid === undefined){
+    nextGrid = make2DArray(my_cols, rows);
+  }
+  let sh_inds = Array.from({ length: my_cols }, (_, i) => i);
   
   // Check every cell
   for (let j = rows-1; j >= 0; j--) {
     let i;
     shuffle(sh_inds, true);
-    for (let iC = 0; iC < cols; iC++) {
+    for (let iC = 0; iC < my_cols; iC++) {
       i = sh_inds[iC];
       // What is the state?
-      let state = grid[i][j];
+      let state = grid[i + col_offset][j];
       
       // If it's a piece of sand!
       if (state > 0) {
         // What is below?
-        let below = nextGrid[i][j + 1];
+        let below = nextGrid[i + col_offset][j + 1];
         
         // Randomly fall left or right
         let dir = 1;
@@ -155,35 +164,35 @@ function getNextGridConservative(grid){
         let belowA = -1;
         let belowB = -1;
         if (withinCols(i + dir)) {
-          belowA = nextGrid[i + dir][j + 1];
+          belowA = nextGrid[i + dir + col_offset][j + 1];
         }
         if (withinCols(i - dir)) {
-          belowB = nextGrid[i - dir][j + 1];
+          belowB = nextGrid[i - dir + col_offset][j + 1];
         }
         
         
         // Can it fall below or left or right?
         if (below === 0) {
-          if (nextGrid[i][j + 1] != 0){
+          if (nextGrid[i + col_offset][j + 1] != 0){
             console.log("Rewriting occupied cell below");
           }
-          nextGrid[i][j + 1] = state;
+          nextGrid[i + col_offset][j + 1] = state;
         } else if (belowA === 0) {
-          if (nextGrid[i + dir][j + 1] != 0){
+          if (nextGrid[i + dir + col_offset][j + 1] != 0){
             console.log("Rewriting occupied cell in direction " + dir);
           }
-          nextGrid[i + dir][j + 1] = state;
+          nextGrid[i + dir + col_offset][j + 1] = state;
         } else if (belowB === 0) {
-          if (nextGrid[i - dir][j + 1] != 0){
+          if (nextGrid[i - dir + col_offset][j + 1] != 0){
             console.log("Rewriting occupied cell in direction " + (-dir));
           }
-          nextGrid[i - dir][j + 1] = state;
+          nextGrid[i - dir + col_offset][j + 1] = state;
         // Stay put!
         } else {
-          if (nextGrid[i][j] != 0){
+          if (nextGrid[i + col_offset][j] != 0){
             console.log("Rewriting occupied cell under me");
           }          
-          nextGrid[i][j] = state;
+          nextGrid[i + col_offset][j] = state;
         }
       }
     }
@@ -211,7 +220,10 @@ function draw() {
   }
   counterTextDiv.html(`${particlesCount} particles (${Math.round(particlesCount*100.0*w*w/graphicsHeight/graphicsWidth)}%)`);
   
-  nextGrid = getNextGridConservative(grid);
+  let nextGrid = make2DArray(cols, rows);
+
+  getNextGridConservative(grid, 0, nextGrid);
+  getNextGridCodingTrain(grid, cols / 2, nextGrid);
   
   if (!dragged && letItSnow){
     let i = floor(random(0, cols));
