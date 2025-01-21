@@ -48,6 +48,8 @@ function setup() {
   // Create a DOM element to display text
   counterTextDiv = createDiv('Counter'); // Empty initially
   counterTextDiv.position(10, graphicsHeight); // Position the text below the input field
+  counterTextDiv.style('font-family', 'Arial'); // Set font family
+  counterTextDiv.style('font-size', '24px');    // Set font size
 }
 
 function mouseDragged() {
