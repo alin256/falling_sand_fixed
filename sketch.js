@@ -22,6 +22,9 @@ let w = 5;
 let cols, rows;
 let hueValue = 200;
 let dragged = false;
+let counterTextDiv;
+let graphicsHeight = 600;
+let graphicsWidth = 1000;
 
 
 // Check if a row is within the bounds
@@ -35,11 +38,16 @@ function withinRows(j) {
 }
 
 function setup() {
-  createCanvas(1000, 600);
+  
+  createCanvas(graphicsWidth, graphicsHeight);
   colorMode(HSB, 360, 255, 255);
   cols = width / w;
   rows = height / w;
   grid = make2DArray(cols, rows);
+  
+  // Create a DOM element to display text
+  counterTextDiv = createDiv('Counter'); // Empty initially
+  counterTextDiv.position(10, graphicsHeight); // Position the text below the input field
 }
 
 function mouseDragged() {
@@ -71,7 +79,7 @@ function mouseDragged() {
 function draw() {
   background(0);
 
-  
+  let particlesCount = 0;
   // Draw the sand
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
@@ -81,9 +89,11 @@ function draw() {
         let x = i * w;
         let y = j * w;
         square(x, y, w);
+        particlesCount++;
       }
     }
   }
+  counterTextDiv.html(`${particlesCount} particles (${Math.round(particlesCount*100.0*w*w/graphicsHeight/graphicsWidth)}%)`);
   
   
   // Create a 2D array for the next frame of animation
