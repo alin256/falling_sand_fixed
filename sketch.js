@@ -138,6 +138,7 @@ function getNextGridConservative(grid){
       }
     }
   }
+  return nextGrid;
 
 }
 
@@ -171,7 +172,7 @@ function draw() {
       hueValue = 1;
     }
   }
-  
+
   grid = nextGrid;
   dragged = false;
 }
